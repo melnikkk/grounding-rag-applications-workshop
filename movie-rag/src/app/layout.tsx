@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 
+import Image from "next/image";
+import TmdbLogo from "../../public/tmdb-logo.svg";
+
+import Nav from "./components/Nav";
+
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -28,7 +33,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="flex flex-col">
+          <Nav showSearch={true} fixed={true} />
+          <main className="flex flex-col">
+            {children}
+          </main>
+          <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+            Credits: This product uses the TMDB API but is not endorsed or certified by TMDB.
+            <div className="footer-logo">
+              <Image
+                className="nav__logo"
+                src={TmdbLogo}
+                alt=""
+              />
+            </div>
+          </footer>
+        </div>
       </body>
     </html>
   );
