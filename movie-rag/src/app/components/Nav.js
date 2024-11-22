@@ -5,7 +5,7 @@ import Image from "next/image";
 
 function Nav(props) {
     return (
-        <div className={`nav ${props.fixed? "nav-fixed" : ""}`} >
+        <div className={`nav ${props.fixed? "nav-fixed" : ""} `} >
             <a href="/">
                 <Image
                     className="nav__logo"
