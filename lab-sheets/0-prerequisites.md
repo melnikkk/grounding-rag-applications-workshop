@@ -92,3 +92,19 @@ docker run -it --rm elastic/eland \
 ```
 
 6. Once complete synchronize your models under the *Machine Learning > Trained Models* page.
+
+## MODEL
+
+Ollama
+
+brew install ollama
+brew services start ollama
+
+ollama pull mxbai-embed-large
+ollama run smollm2
+
+
+npm i ollama
+npm i @langchain/community @elastic/elasticsearch @langchain/ollama @langchain/core
+
+direnv!

@@ -1,9 +1,30 @@
-export default function Home() {
+'use client';
+
+import { useChat } from 'ai/react';
+
+export default function Chat() {
+  const { messages, input, handleInputChange, handleSubmit } = useChat();
   return (
-    <div className="flex flex-col">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-            Hi, I am Oscar! Ask me anything!
-      </main>
+    <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
+      <div className="space-y-4">
+        {messages.map(m => (
+          <div key={m.id} className="whitespace-pre-wrap">
+            <div>
+              <div className="font-bold">{m.role}</div>
+              <p>{m.content}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
+          value={input}
+          placeholder="Ask me anything about movies..."
+          onChange={handleInputChange}
+        />
+      </form>
     </div>
   );
 }

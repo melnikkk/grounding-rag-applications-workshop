@@ -1,7 +1,3 @@
-import Image from "next/image";
-import TmdbLogo from "../../public/tmdb-logo.svg";
-
-import Nav from "./components/Nav";
 import Header from "./components/Header";
 import Popular from "./components/Popular";
 import Recent from "./components/Recent";
