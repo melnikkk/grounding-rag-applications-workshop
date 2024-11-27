@@ -3,7 +3,10 @@ import {
   type ElasticClientArgs,
 } from "@langchain/community/vectorstores/elasticsearch";
 import { Document } from "@langchain/core/documents";
-import { RecursiveCharacterTextSplitter, TextSplitter } from "langchain/text_splitter";
+import {
+  RecursiveCharacterTextSplitter,
+  TextSplitter,
+} from "langchain/text_splitter";
 
 import { OllamaEmbeddings } from "@langchain/ollama";
 
@@ -45,7 +48,9 @@ const vectorStore = new ElasticVectorSearch(ollamaEmbeddings, clientArgs);
  * @param pathToJSON file containing movies
  * @returns array of documents
  */
-async function generateDocumentsFromJson(pathToJSON: string): Promise<Document[]> {
+async function generateDocumentsFromJson(
+  pathToJSON: string
+): Promise<Document[]> {
   try {
     const jsonDocs: MovieCollection = JSON.parse(
       fs.readFileSync(pathToJSON).toString()
@@ -60,7 +65,10 @@ async function generateDocumentsFromJson(pathToJSON: string): Promise<Document[]
     let documents: Document[] = [];
 
     for (const content of jsonDocs.results) {
-      const splitDocs: Document[] = await splitContentByOverview(textSplitter, content);
+      const splitDocs: Document[] = await splitContentByOverview(
+        textSplitter,
+        content
+      );
       documents = documents.concat(splitDocs);
     }
     return documents;
@@ -72,31 +80,34 @@ async function generateDocumentsFromJson(pathToJSON: string): Promise<Document[]
 
 /**
  * Chunk content into smaller documents based on overview
- * @param textSplitter 
- * @param content 
+ * @param textSplitter
+ * @param content
  * @returns Document[] based on split document
  */
-async function splitContentByOverview(textSplitter: TextSplitter, content: Movie) {
-    const splits = await textSplitter.splitText(content.overview);
-    console.log(`Split doc count: ${splits.length}`);
+async function splitContentByOverview(
+  textSplitter: TextSplitter,
+  content: Movie
+) {
+  const splits = await textSplitter.splitText(content.overview);
+  console.log(`Split doc count: ${splits.length}`);
 
-    const splitDocs: Document[] = splits.map((split, index) => {
-        return new Document({
-            pageContent: split,
-            metadata: {
-                title: content.title,
-                original_language: content.original_language,
-                popularity: content.popularity,
-                releaseDate: new Date(content.release_date),
-                vote_average: content.vote_average,
-                vote_count: content.vote_count,
-                isAdult: content.adult,
-                posterPath: `https://image.tmdb.org/t/p/original${content.poster_path}`,
-                chunk: index,
-            },
-        });
+  const splitDocs: Document[] = splits.map((split, index) => {
+    return new Document({
+      pageContent: split,
+      metadata: {
+        title: content.title,
+        original_language: content.original_language,
+        popularity: content.popularity,
+        releaseDate: new Date(content.release_date),
+        vote_average: content.vote_average,
+        vote_count: content.vote_count,
+        isAdult: content.adult,
+        posterPath: `https://image.tmdb.org/t/p/original${content.poster_path}`,
+        chunk: index,
+      },
     });
-    return splitDocs;
+  });
+  return splitDocs;
 }
 
 // Ingest document with embedding
@@ -112,7 +123,7 @@ async function generateEmbeddings(documents: Document[]): Promise<string[]> {
 /**
  * Example search function to find relevant movies
  * @param text: prompt to be used for similarity search
- * @returns 
+ * @returns
  */
 async function findRelevantMovies(text: string): Promise<Document[]> {
   try {
