@@ -1,12 +1,83 @@
 # Lab 0: Setup
 
-So you want to build a RAG app? Brilliant, as this is exactly what this workshop is for! 
+So you want to build a RAG app with React? Brilliant, as this is exactly what this workshop is for! 
 
 There are a couple of things you'll need before we start:
 
-## 1. An Elastic cluster to store your documents and perform searches against. 
+## 0: Assumed installations
 
-For those following along after, please follow the below steps to create your own cluster using an Elastic free trial:
+Please ensure you have the following tools installed:
+
+1. [Node.js](https://nodejs.org/en)
+2. [npm](https://www.npmjs.com/)
+ 
+To check you have Node.js and npm installed, run the following commands:
+
+```bash
+node -v
+npm -v
+```
+
+3. [tsx](https://www.npmjs.com/package/tsx)
+
+If you don't have tsx installed please make sure you have a global install configured by running the below command:
+
+```zsh
+npm install -g tsx
+```
+
+If you receive an error, [download and install Node.js and npm using these instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
+
+## 2: Ollama installation
+
+There are many open source and proprietary machine learning models out there that can be used when building RAG applications. To make local development easy, we shall be using [Ollama](https://ollama.com/) to run our models locally.
+
+```zsh
+brew install ollama
+```
+
+We'll cover how to pull and run models locally in the workshop.
+
+## 3. Initialization of the starting point application:
+
+To help you get started, a very simple web application is included in this repository under the `movie-rag` folder. To initialize the application, please follow the below commands in a terminal to start the application. 
+
+```bash
+cd movie-rag
+npm install
+npm run start
+```
+
+Please ensure that you are present in the top-level folder for this project when you start. These steps should be the same for Windows and Mac.
+
+## 4: direnv (or alternative) [OPTIONAL]
+
+This lab makes use of environment variables for some attributes that are loaded using `process.env` within our application. For ease in the workshop I recommend using a shell environment loading tool such as [direnv](https://github.com/direnv/direnv) configured to support `env` files.
+
+If using `direnv` also make sure that you have configured your profile to accept `.env` files:
+
+```zsh
+cat $HOME/.config/direnv/direnv.toml 
+```
+
+Example config:
+
+```toml
+[global]
+load_dotenv=true
+```
+
+## 5. An Elastic cluster to store your documents and perform searches against [OPTIONAL] 
+
+If you're attending the workshop at React Day Berlin, check out the cluster credentials .env file for your assigned group ont he day. You will see configuration that looks a bit like this:
+
+```zsh
+ELASTIC_DEPLOYMENT=https://my-random-elastic-deployment:123
+ELASTIC_API_KEY=ARandomKey!
+INDEX_NAME="movies"
+```
+
+For those following along outside this time, or who want their own cluster, please follow either the [start-local steps](https://www.elastic.co/guide/en/elasticsearch/reference/current/run-elasticsearch-locally.html) or register for an Elastic Cloud free trial via the below steps:
 
 1. Create a trial account at [https://cloud.elastic.co/](https://cloud.elastic.co/) using the *Start free trial* button.
 2. Add the basic settings for your new cluster:
@@ -24,87 +95,4 @@ For those following along after, please follow the below steps to create your ow
 5. Take a note of your deployment credentials somewhere safe. Especially the password!
 6. Navigate to your deployment once ready with the *Continue* button.
 
-## 2. Installation of Node and npm
-
-This project requires installation of [Node.js](https://nodejs.org/en) and [npm](https://www.npmjs.com/) before starting. Both are essential for modern full-stack web development in JavaScript.
-
-To check you have Node.js and npm installed, run the following commands:
-
-```bash
-node -v
-npm -v
-```
-
-If you receive an error, [download and install Node.js and npm using these instructions](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm). [This blog also gives detailed steps on how to install using installers](https://radixweb.com/blog/installing-npm-and-nodejs-on-windows-and-mac).
-
-## 3. Initialization of the starting point application:
-
-To help you get started, a very simple web application is included in this repository under the `movie-rag` folder. To initialize the application, please follow the below commands in a terminal to start the application. 
-
-```bash
-cd movie-rag
-npm install
-npm run start
-```
-
-Please ensure that you are present in the top-level folder for this project when you start. These steps should be the same for Windows and Mac.
-
-## 4. Import text embedding model from Hugging Face (optional)
-
-*Note: this step is only needed if you have created your own cluster*
-
-To generate the vectors for both our documents and queries, we need to use a machine learning model to generate the text embeddings. Although this can be achieved using the [inference endpoint exposed through the Huggingface.js API](https://huggingface.co/docs/huggingface.js/en/inference/README#feature-extraction), we are making use of model [`sentence-transformers/msmarco-MiniLM-L-12-v3`](https://huggingface.co/sentence-transformers/msmarco-MiniLM-L-12-v3) previously imported by the facilitator for ease.
-
-This guide is based on the [How to deploy a text embedding model and use it for semantic search](https://www.elastic.co/guide/en/machine-learning/current/ml-nlp-text-emb-vector-search-example.html) from the Elastic documentation:
-
-1. [Install Docker](https://docs.docker.com/get-docker/)
-2. Open Docker on your machine
-3. Via the command line terminal, pull the latest Docker image of [*Eland*, the Elastic Python machine learning client](https://www.elastic.co/guide/en/elasticsearch/client/eland/current):
-
-```bash
-docker pull docker.elastic.co/eland/eland
-```
-
-4. Define the `ELASTIC_CLOUD_ID` and `ELASTIC_API_KEY` values of your cluster as environment variables:
-
-Linux/ Mac:
-```bash
-export ELASTIC_CLOUD_ID=MY_CLOUD_ID
-export ELASTIC_API_KEY=MY-API-KEY
-```
-
-Windows:
-```cmd
-set ELASTIC_CLOUD_ID=MY_CLOUD_ID
-set ELASTIC_API_KEY=MY-API-KEY
-```
-
-5. Install the model in your cluster:
-
-```bash
-docker run -it --rm elastic/eland \
-    eland_import_hub_model \
-      --cloud-id $ELASTIC_CLOUD_ID \
-      --es-api-key $ELASTIC_API_KEY \
-      --hub-model-id sentence-transformers/msmarco-MiniLM-L-12-v3 \
-      --task-type text_embedding \
-      --start
-```
-
-6. Once complete synchronize your models under the *Machine Learning > Trained Models* page.
-
-## MODEL
-
-Ollama
-
-brew install ollama
-brew services start ollama
-
-ollama pull mxbai-embed-large
-ollama run smollm2
-
-
-npm i ollama
-npm i @langchain/community @elastic/elasticsearch @langchain/ollama @langchain/core
-
-direnv!
+Happy workshopping!
