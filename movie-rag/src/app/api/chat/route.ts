@@ -1,15 +1,8 @@
-import { createOllama } from "ollama-ai-provider";
-import { streamText } from "ai";
-
-import { findRelevantMovies } from "../../lib/elasticsearch";
+import { LangChainAdapter } from 'ai';
+import { recommendMovies } from "../../lib/movie-finder";
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
-
-// Ollama community provider
-const ollama = createOllama({
-  baseURL: "http://localhost:11434/api", // Default
-});
+export const maxDuration = 30; // TODO
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -21,19 +14,11 @@ export async function POST(req: Request) {
     }
   }
 
-  const documents = await findRelevantMovies(messages[0].content);
-
   try {
-    const result = streamText({
-      model: ollama("smollm2"),
-      system: `You are a helpful movie trivial assistant that loves to recommend movies to people. 
-      Check your knowledge base before answering any questions.
-      If no relevant information is found in the tool calls, respond, "${errorMessage}"
-      Only respond to questions using the these documents: ${documents}`,
-      messages
-    });
-
-    return result.toDataStreamResponse();
+    const question: string = messages[messages.length - 1].content;
+    const stream = await recommendMovies(question);
+    
+    return LangChainAdapter.toDataStreamResponse(stream);
   } catch (e) {
     console.error(e);
     return {
