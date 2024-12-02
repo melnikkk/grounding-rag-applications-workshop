@@ -1,6 +1,6 @@
-# Lab 4: Generate Vector Embeddings
+# Lab 2: Generate Vector Embeddings
 
-Following our success in building a simple text search based web application, we shall generate vectors for the movie documents in our cluster.
+Following our success in ingesting documents, we shall generate vectors for the movie documents in our cluster using Elasticsearch and Langchain.
 
 ## What is a vector?
 
@@ -21,111 +21,281 @@ Vector search is the fundamental algorithm that underpins semantic search, which
 
 ![kNN search overview](./screenshots/4/lab-4-knn-search-overview.png)
 
-In this lab, we shall make use of the transformer model [`sentence-transformers/
-msmarco-MiniLM-L-12-v3`](https://huggingface.co/sentence-transformers/msmarco-MiniLM-L-12-v3) uploaded from HuggingFace to our Elastic cluster to generate vectors for our movie documents using an [Ingest pipeline](https://www.elastic.co/guide/en/elasticsearch/reference/current/ingest.html). The alternative approach to generate vectors in our application and send to Elasticsearch for `kNN` search are not covered here, but can be done as [this example highlights](https://www.elastic.co/search-labs/tutorials/search-tutorial/vector-search/generate-embeddings).
+In this lab, we shall make use of the transformer model [`mxbai-embed-large`](https://ollama.com/library/mxbai-embed-large) downloaded to our machine using [Ollama](https://ollama.com/) alongside [Langchain](https://js.langchain.com/docs/introduction/) to generate embeddings for our documents. These documents shall also be ingested into Elasticsearch, replacing the previous index of documents.
+
+The alternative approach is to generate embeddings behind the scenes using the `semantic_text` field type based on a model imported into Elasticsearch. Instructions on this approach [is covered in this blog](https://www.elastic.co/search-labs/blog/semantic-search-simplified-semantic-text). Note that this approach uses a licensed feature, unlike the approach here.
 
 ## Steps
 
-1. Check that we have a trained model deployed in Elastic by navigating to the *Stack Management > Machine Learning* screen:
+1. If you haven't already, install Ollama onto your machine:
 
-![Elastic Trained Model Management screen](./screenshots/4/lab-4-trained-model-deployment-check.png)
+```zsh
+brew install ollama
+brew services start ollama
 
-2. Navigate to the *Dev Tools * console, and check that a ingest pipeline named `enrich-movies-with-vectors` is present:
-
-```json
-GET _ingest/pipeline/enrich-movies-with-vectors
+ollama serve
 ```
 
-3. Using the *Dev Tools* console, create a new index  `vector-movies-<your-first-name>-<your-last-name>` to contain the enriched movies, specifying the `text_embedding` field that will include our resulting vector. For example, the facilitator's index is named `vector-movies-carly-richmond`:
+For Windows follow [this guide](https://dev.to/evolvedev/how-to-install-ollama-on-windows-1ei5).
 
-```json
-PUT vector-movies-carly-richmond
-{
-  "mappings": {
-    "properties": {
-      "embedding": {
-        "type": "dense_vector",
-        "dims": 384
-      }
-    }
-  }
+2. Download and start model `mxbai-embed-large` via the terminal, and confirm the manifest has been downloaded:
+
+```zsh
+ollama pull mxbai-embed-large
+ollama list
+```
+
+3. Via the terminal, send a simple cURL request to generate embeddings for a given prompt:
+
+```
+curl http://localhost:11434/api/embeddings -d '{
+  "model": "mxbai-embed-large",
+  "prompt":"Why is the sky blue?"
+}'
+
+```
+
+4. Moving to the code, in the `ingestion` folder, install the required `langchain` and `ollama` dependencies:
+
+```zsh
+npm i @langchain/community @elastic/elasticsearch @langchain/ollama @langchain/core
+```
+
+5. Initialize the Ollama embeddings using Langchain:
+
+```ts
+import { OllamaEmbeddings } from "@langchain/ollama";
+
+// Initialize Ollama embeddings
+const ollamaEmbeddings = new OllamaEmbeddings({
+  model: "mxbai-embed-large", // Default value
+  //baseUrl: "http://localhost:11434", // Default value
+});
+```
+
+6. Create a new vector store using Langchain, passing an instance of the Elasticsearch client:
+
+```ts
+import {
+  ElasticVectorSearch,
+  type ElasticClientArgs,
+} from "@langchain/community/vectorstores/elasticsearch";
+
+import { Client, type ClientOptions } from "@elastic/elasticsearch";
+
+// Initialize Langchain and Elasticsearch
+const config: ClientOptions = {
+  node: process.env.ELASTIC_DEPLOYMENT,
+};
+
+if (process.env.ELASTIC_API_KEY) {
+  config.auth = {
+    apiKey: process.env.ELASTIC_API_KEY,
+  };
 }
-```
 
-4. Reindex our movie data into the new index using `vector-movies-<your-first-name>-<your-last-name>` using the ingest pipeline `enrich-movies-with-vectors`. 
-
-```json
-POST _reindex?slices=5&refresh
-{
-  "source": {
-    "index": "movies-carly-richmond"
+const clientArgs: ElasticClientArgs = {
+  client: new Client(config),
+  indexName: process.env.INDEX_NAME,
+  vectorSearchOptions: {
+    engine: "hnsw",
+    similarity: "dot_product", //Default cosine
   },
-  "dest": {
-    "index": "vector-movies-carly-richmond",
-    "pipeline": "enrich-movies-with-vectors"
-  }
-}
+};
+
+const vectorStore = new ElasticVectorSearch(ollamaEmbeddings, clientArgs);
 ```
 
-If you are finding that the request is timing out or returning with failures, try limiting the reindex operation to just movies with *cold* in the title to reduce the number of documents:
+7. We're going to split the documents into smaller chunks using a `RecursiveTextSplitter` when loading the documents from `data/movies.json`:
 
-```json
-POST _reindex
-{
-  "source": {
-    "index": "movies-carly-richmond",
-    "query": {
-      "match": {
-        "title": "cold"
-      }
+```ts
+import { Document } from "@langchain/core/documents";
+import {
+  RecursiveCharacterTextSplitter,
+  TextSplitter,
+} from "langchain/text_splitter";
+
+import fs from "node:fs";
+import { Movie, MovieCollection } from "./movies";
+
+/**
+ * Generate collection of documents from specified JSON file
+ * @param pathToJSON file containing movies
+ * @returns array of documents
+ */
+async function generateDocumentsFromJson(
+  pathToJSON: string
+): Promise<Document[]> {
+  try {
+    const jsonDocs: MovieCollection = JSON.parse(
+      fs.readFileSync(pathToJSON).toString()
+    );
+    console.log(`Doc count: ${jsonDocs.results.length}`);
+
+    // Split text based on overview
+    const textSplitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 200,
+      chunkOverlap: 0,
+    });
+    let documents: Document[] = [];
+
+    for (const content of jsonDocs.results) {
+      const splitDocs: Document[] = await splitContentByOverview(
+        textSplitter,
+        content
+      );
+      documents = documents.concat(splitDocs);
     }
-  },
-  "dest": {
-    "index": "vector-movies-carly-richmond",
-    "pipeline": "enrich-movies-with-vectors"
+    return documents;
+  } catch (e) {
+    console.log(e);
+    return [];
   }
 }
 ```
 
-5. Check index `vector-movies-<your-first-name>-<your-last-name>` contains documents including field `embedding`:
+To do this, create a utility function to split the documents based on overview using the splitter we have created:
 
-```json
-GET vector-movies-carly-richmond/_search
+```ts
+/**
+ * Chunk content into smaller documents based on overview
+ * @param textSplitter
+ * @param content
+ * @returns Document[] based on split document
+ */
+async function splitContentByOverview(
+  textSplitter: TextSplitter,
+  content: Movie
+) {
+  const splits = await textSplitter.splitText(content.overview);
+  console.log(`Split doc count: ${splits.length}`);
+
+  const splitDocs: Document[] = splits.map((split, index) => {
+    return new Document({
+      pageContent: split,
+      metadata: {
+        title: content.title,
+        original_language: content.original_language,
+        popularity: content.popularity,
+        releaseDate: new Date(content.release_date),
+        vote_average: content.vote_average,
+        vote_count: content.vote_count,
+        isAdult: content.adult,
+        posterPath: `https://image.tmdb.org/t/p/original${content.poster_path}`,
+        chunk: index,
+      },
+    });
+  });
+  return splitDocs;
+}
 ```
 
-6. Investigate the index mapping and compare to the original index `movies-<your-first-name>-<your-last-name>`. What is the data type of field `embedding`?
+8. Create a utility function to generate embeddings for our documents using the vector store, and add them to Elasticsearch:
 
-```json
-GET vector-movies-carly-richmond/_mapping
+```ts
+// Ingest document with embedding
+async function generateEmbeddings(documents: Document[]): Promise<string[]> {
+  try {
+    return await vectorStore.addDocuments(documents);
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+}
+```
 
-GET movies-carly-richmond/_search
+9. Joining everything together in our `main` function will ingest all documents with corresponding embeddings:
+
+```ts
+async function main() {
+  // Clean up index if it exists
+  vectorStore.deleteIfExists();
+
+  // Load data from JSON
+  const documents = await generateDocumentsFromJson("./data/movies.json");
+
+  // Ingest documents and generate embeddings
+  const ids = await generateEmbeddings(documents);
+  console.log(`Ingested ${ids.length} documents with embeddings`);
+}
+
+main();
+```
+
+10. Create a utility function `findRelevantMovies`, similar to before, that performs a vector search using a question, filtering out adult content:
+
+```ts
+/**
+ * Example search function to find relevant movies
+ * @param text: prompt to be used for similarity search
+ * @returns
+ */
+async function findRelevantMovies(text: string): Promise<Document[]> {
+  try {
+    const filter = [
+      {
+        operator: "match",
+        field: "isAdult",
+        value: false,
+      },
+    ];
+
+    const similaritySearchResults = await vectorStore.similaritySearch(
+      text,
+      1,
+      filter
+    );
+    return similaritySearchResults;
+  } catch (e) {
+    console.log(e);
+    return [];
+  }
+}
+```
+
+11. Amend the main method to find relevant movies using the question *Find me a movie featuring a dark anti-hero*:
+
+```ts
+async function main() {
+  // Prior code omitted
+
+  // Example retrieval
+  const topMovieResult = await findRelevantMovies(
+    "Find me a movie featuring a dark anti-hero"
+  );
+
+  console.log(`The anti-hero movie is: "${topMovieResult[0].metadata.title}"`);
+}
+
+main();
 ```
 
 ## Expected Result
 
-If all goes well you will have a new index `vector-movies-<your-first-name>-<your-last-name>` containing a set of movies enriched with a dense vector field similar to the below:
+If all goes well you will have replaced your index with a set of movies enriched with a dense vector field similar to the below:
 
 ```json
 {
-  "_index": "vector-movies-carly-richmond",
-  "_id": "HDJff40BMj9C_ao6YmAM",
-  "_score": 0.59750485,
-  "_ignored": [
-    "overview.keyword"
-  ],
+  "_index": "movies",
+  "_id": "6835b8ef-f8fa-426a-b96f-28cc06196e54",
+  "_score": 2.8742206,
   "_source": {
-    "overview": "HA Yoon-ju becomes the newest member to a unit within the Korean Police Forces Special Crime Department that specializes in surveillance activities on high profile criminals. She teams up with HWANG Sang-Jun, the veteran leader of the unit, and tries to track down James who is the cold-hearted leader of an armed criminal organization.",
-    "original_language": "ko",
-    "vote_average": 7.4,
-    "id": 7593,
     "embedding": [
-          -0.07696302980184555,
-          0.32373741269111633,
-          ...
-        ],
-    "model_id": "sentence-transformers__msmarco-minilm-l-12-v3",
-    "title": "Cold Eyes",
-    "vote_count": 107
+      0.0385989,
+      -0.00013410488, ...
+      ],
+    "metadata": {
+      "title": "Deadpool & Wolverine",
+      "original_language": "en",
+      "popularity": 1722.492,
+      "releaseDate": "2024-07-24T00:00:00.000Z",
+      "vote_average": 7.707,
+      "vote_count": 4910,
+      "isAdult": false,
+      "posterPath": "https://image.tmdb.org/t/p/original/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+      "chunk": 0
+      },
+    "text": "A listless Wade Wilson toils away in civilian life with his days as the morally flexible mercenary, Deadpool, behind him. But when his homeworld faces an existential threat, Wade must reluctantly"
   }
 }
 ```

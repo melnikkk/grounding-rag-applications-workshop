@@ -41,7 +41,7 @@ npm install @elastic/elasticsearch
 
 3. Open the file `ingest_documents_only.ts` and initialize the Elasticsearch client:
 
-```js
+```ts
 import { Client, type ClientOptions } from "@elastic/elasticsearch";
 
 // Initialize Elasticsearch
@@ -57,7 +57,7 @@ const indexName = process.env.INDEX_NAME;
 
 4. Write a utility function to load the sample data from file `data/movies.json`:
 
-```js
+```ts
 import fs from "node:fs";
 import { Movie, MovieCollection } from "./movies";
 
@@ -83,7 +83,7 @@ async function generateDocumentsFromJson(pathToJSON: string): Promise<Movie[]> {
 
 5. Write a main function to create the index and ingest the documents, validating that `20` documents are ingested:
 
-```js
+```ts
 async function main() {
   // Clean up index if it exists
   if (indexName && (await client.indices.exists({ index: indexName }))) {
@@ -112,7 +112,7 @@ main();
 
 6. Create a new helper function `findRelevantMovies` to run a simple match query to find titles containing the provided parameter `text`:
 
-```js
+```ts
 /**
  * Example search function to find relevant movies
  * @param text: prompt to be used for similarity search
@@ -140,7 +140,7 @@ async function findRelevantMovies(text: string): Promise<Movie[]> {
 
 7. Amend the `main` method to find movies containing "Venom" in the title:
 
-```js
+```ts
 // Example retrieval
 async function main() {
     // Prior code goes here
