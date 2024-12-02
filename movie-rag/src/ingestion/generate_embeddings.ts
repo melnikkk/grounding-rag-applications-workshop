@@ -37,7 +37,7 @@ const clientArgs: ElasticClientArgs = {
   indexName: process.env.INDEX_NAME,
   vectorSearchOptions: {
     engine: "hnsw",
-    similarity: "dot_product", //Default cosine
+    similarity: "cosine"
   },
 };
 

@@ -276,7 +276,7 @@ If all goes well you will have replaced your index with a set of movies enriched
 
 ```json
 {
-  "_index": "movies",
+  "_index": "movies-carly-richmond",
   "_id": "6835b8ef-f8fa-426a-b96f-28cc06196e54",
   "_score": 2.8742206,
   "_source": {

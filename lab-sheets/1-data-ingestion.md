@@ -7,8 +7,7 @@ In this section we are going to populate our Elasticsearch cluster with data. Th
 3. [Elastic Agent](https://www.elastic.co/elastic-agent)
 4. [Language clients](https://www.elastic.co/guide/en/elasticsearch/client/index.html) (such as the [Node.js client bulk index example](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/bulk_examples.html))
 
-[TODO- change to TSDB API and add chunking with Langchain!]
-For ease, in this workshop we shall use the CSV upload capabilities in Kibana to create and populate our index. An inverted index is a data structure, much like the index of a book, where key terms are stored alongside a reference to the document in which they reside:
+We shall use the [Elasticsearch JavaScript client](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html) to create and populate our index. An inverted index is a data structure, much like the index of a book, where key terms are stored alongside a reference to the document in which they reside:
 
 ![Inverted Index Generation](../diagrams/inverted-index-example.png)
 
@@ -24,12 +23,14 @@ Alternatively, please use the [provided JSON in the `data` folder](../movie-rag/
 
 ### Document Ingestion
 
-1. Obtain your sample `.env` file from the instructor, and move it to the `movie-rag` folder. If using `direnv`, running `direnv allow` will refresh your env variables, which should be similar to the following:
+1. Obtain your sample `.env` file from the instructor, and move it to the `movie-rag` folder. Postfix the `INDEX_NAME` with your full name to avoid clashing with other attendees. For example, the instructor would use the index `movies-carly-richmond`.
+
+If using `direnv`, running `direnv allow` will refresh your env variables, which should be similar to the following:
 
 ```zsh
 ELASTIC_DEPLOYMENT=https://1d128591448540e39104d12ed630c500.eu-west-2.aws.cloud.es.io:443
 ELASTIC_API_KEY=NFMyYVk1TUJGWHE0bEFjb3lDYjY6VEtWSy1HLXhSLWlXYW1HR1BGNXpxZw==
-INDEX_NAME="movies"
+INDEX_NAME="movies-carly-richmond"
 ```
 
 2. Install the Elasticsearch JavaScript client under the `ingestion` folder:
