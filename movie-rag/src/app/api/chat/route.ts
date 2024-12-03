@@ -2,7 +2,7 @@ import { LangChainAdapter } from 'ai';
 import { recommendMovies } from "../../lib/movie-finder";
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30; // TODO
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();

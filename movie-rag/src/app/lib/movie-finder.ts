@@ -4,7 +4,7 @@ import {
 } from "@langchain/community/vectorstores/elasticsearch";
 
 import { Ollama, OllamaEmbeddings } from "@langchain/ollama";
-import { ChatPromptTemplate, MessagesPlaceholder, PromptTemplate } from "@langchain/core/prompts";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
 
 import { Client, type ClientOptions } from "@elastic/elasticsearch";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
@@ -32,7 +32,7 @@ const clientArgs: ElasticClientArgs = {
   indexName: process.env.INDEX_NAME,
   vectorSearchOptions: {
     engine: "hnsw",
-    similarity: "dot_product", //Default cosine
+    similarity: "cosine", //Default cosine
   },
 };
 
@@ -48,8 +48,8 @@ const template = `You are a helpful movie trivial assistant that loves to recomm
       {context}
       </context>`;
 
-      const prompt = ChatPromptTemplate.fromTemplate(template)l
-      
+const prompt = ChatPromptTemplate.fromTemplate(template);
+
 const llm = new Ollama({
   model: "llama3", // Default: "llama3",
   temperature: 0,
@@ -61,28 +61,30 @@ const llm = new Ollama({
  * @param text: prompt to be used for similarity search
  * @returns
  */
-export async function recommendMovies(question: string): Promise<ReadableStream<any>> {
-    const filter = [
-      {
-        operator: "match",
-        field: "isAdult",
-        value: false,
-      },
-    ];
-    const retriever = vectorStore.asRetriever(3, filter);
+export async function recommendMovies(
+  question: string
+): Promise<ReadableStream> {
+  const filter = [
+    {
+      operator: "match",
+      field: "isAdult",
+      value: false,
+    },
+  ];
+  const retriever = vectorStore.asRetriever(3, filter);
 
-    const customRagChain = await createStuffDocumentsChain({
-        llm: llm,
-        prompt: prompt,
-        outputParser: new StringOutputParser(),
-      });
-      
-      const context = await retriever.invoke(question);
-      
-      const stream = await customRagChain.stream({
-        question: question,
-        context
-      });
+  const customRagChain = await createStuffDocumentsChain({
+    llm: llm,
+    prompt: prompt,
+    outputParser: new StringOutputParser(),
+  });
 
-      return stream;
+  const context = await retriever.invoke(question);
+
+  const stream = await customRagChain.stream({
+    question: question,
+    context,
+  });
+
+  return stream;
 }
