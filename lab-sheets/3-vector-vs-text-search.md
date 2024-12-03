@@ -1,18 +1,18 @@
-# Lab 5: Semantic Search vs Lexical Search
+# Lab 3: Semantic Search vs Lexical Search
 
 Now we have enriched our movie data with vectors, it's time to compare traditional lexical search with vector search and see what kinds of queries they accept. For this lab, please ensure you have completed the [data ingestion](./1-data-ingestion) and [vector embedding generation](./2-vector-embeddings) modules as a minimum.
 
 ## What is Semantic Search?
 
-[Semantic search](https://www.elastic.co/guide/en/elasticsearch/reference/current/semantic-search.html) is an approach that helps you find data based on the contextual meaning. Unlike [lexical search discussed previously in lab 2](./2-text-search), it finds documents based on intent using [vector search to find documents close to the query within the vector space](./4-vector-embeddings).
+[Semantic search](https://www.elastic.co/guide/en/elasticsearch/reference/current/semantic-search.html) is an approach that helps you find data based on the contextual meaning. Unlike lexical search, it finds documents based on intent using [vector search to find documents close to the query within the vector space](./2-vector-embeddings.md).
 
-![Star Wars Sample Vector Space](./screenshots/5/lab-5-query-in-vector-space.png)
+![Star Wars Sample Vector Space](./screenshots/3/lab-3-query-in-vector-space.png)
 
 Vector search is the fundamental algorithm that underpins semantic search, which you will have seen in search engines where you ask questions and they return relevant results whose keywords may not exactly match. 
 
 *kNN, or k-Nearest Neighbour* search, compares the embedded query with the documents in the vector space and returns the documents closest to the query through [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance):
 
-![kNN search overview](./screenshots/4/lab-4-knn-search-overview.png)
+![kNN search overview](./screenshots/3/lab-3-knn-search-overview.png)
 
 ## Steps
 
