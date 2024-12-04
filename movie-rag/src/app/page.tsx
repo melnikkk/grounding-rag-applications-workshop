@@ -1,5 +1,6 @@
 import Header from "./components/Header";
 import Popular from "./components/Popular";
+import TryOscarLink from "./components/TryOscarLink";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
             <div className="recommendations">
                 <Popular />
             </div>
+            <TryOscarLink/>
       </main>
     </div>
   );

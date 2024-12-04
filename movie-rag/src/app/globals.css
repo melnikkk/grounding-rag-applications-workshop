@@ -25,6 +25,24 @@ body {
   margin: 0;
 }
 
+/*Oscar link*/
+.oscar-link {   
+  position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    background-color: #F68FBE;
+    border: 1px solid #81858f;
+    height: 45px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 5%;
+    width: 100px;
+    text-align: center;
+    padding-top: 0.5rem;
+    font-weight: bold;
+}
+
+
 /* From Elastifix*/
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
