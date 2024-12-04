@@ -5,12 +5,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --font-color: var(--background);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --font-color: var(--background);
   }
 }
 
@@ -40,6 +42,10 @@ body {
     text-align: center;
     padding-top: 0.5rem;
     font-weight: bold;
+}
+
+#oscar-input {
+  color: var(--font-color) !important;
 }
 
 /* From Elastifix*/
