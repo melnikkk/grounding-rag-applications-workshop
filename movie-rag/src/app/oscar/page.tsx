@@ -12,7 +12,7 @@ export default function Chat() {
         map(m => (
           <div key={m.id} className="whitespace-pre-wrap">
             <div>
-              <div className="font-bold">{m.role}</div>
+              <div className="font-bold">{m.role === "assistant" ? "Oscar" : "Me"}</div>
               <p>{m.content}</p>
             </div>
           </div>
@@ -20,14 +20,14 @@ export default function Chat() {
       </div>
 
       { isLoading && (
-        <div>
+        <div className="spinner__container">
           <Spinner />
         </div>
       ) }
 
       <form onSubmit={handleSubmit}>
         <input
-          id="oscar-input"
+          id="oscar__input"
           className="fixed bottom-0 w-full max-w-md p-2 mb-8 border border-gray-300 rounded shadow-xl"
           value={input}
           placeholder="Ask me anything about movies..."

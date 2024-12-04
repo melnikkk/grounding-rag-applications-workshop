@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Anton');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,13 +8,13 @@
   --background: #ffffff;
   --foreground: #171717;
   --font-color: var(--background);
+  --spinner-font: Anton, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
-    --font-color: var(--background);
   }
 }
 
@@ -44,8 +46,46 @@ body {
     font-weight: bold;
 }
 
-#oscar-input {
+#oscar__input {
   color: var(--font-color) !important;
+}
+
+/* Movie Spinner credit 
+https://codepen.io/pozda/pen/XxoyKe */
+.spinner__container {
+  margin: auto;
+  margin-top: 2rem;
+}
+
+.loader__text {
+      margin: 5px auto;
+      color: var(--foreground);    
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: var(--spinner-font);
+  }
+
+.loader__filmstrip {
+  position: relative;
+  width: 56px;
+  height: 70px;
+  background: var(--foreground);
+  z-index: -1;
+  &:before, &:after {
+      content: '';
+      position: absolute;
+      height: 120%;
+      border-left: 5px dashed var(--background);
+      animation: roll 20ms infinite;
+  }
+  &:before {left: 5px;}
+  &:after {right: 5px;}
+  
+}
+
+@keyframes roll {
+  0% {top: 0px;}
+  100% {top: -15px;}
 }
 
 /* From Elastifix*/

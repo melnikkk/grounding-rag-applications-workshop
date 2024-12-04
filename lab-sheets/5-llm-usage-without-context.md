@@ -62,7 +62,7 @@ export default function Chat() {
         {messages.map(m => (
           <div key={m.id} className="whitespace-pre-wrap">
             <div>
-              <div className="font-bold">{m.role}</div>
+              <div className="font-bold">{m.role === "assistant" ? "Oscar" : "Me"}</div>
               <p>{m.content}</p>
             </div>
           </div>
