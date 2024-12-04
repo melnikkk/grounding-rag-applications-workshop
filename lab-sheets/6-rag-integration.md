@@ -91,6 +91,9 @@ const llm = new Ollama({
 5. Create a new utility function `recommendMovies` that filters out adult content and streams the response from the LLM using a retriever and document chain:
 
 ```tsx
+import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+
 /**
  * Example search function to find relevant movies
  * @param text: prompt to be used for similarity search

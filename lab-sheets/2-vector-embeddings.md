@@ -47,12 +47,11 @@ ollama list
 
 3. Via the terminal, send a simple cURL request to generate embeddings for a given prompt:
 
-```
+```zsh
 curl http://localhost:11434/api/embeddings -d '{
   "model": "mxbai-embed-large",
   "prompt":"Why is the sky blue?"
 }'
-
 ```
 
 4. Moving to the code, in the `ingestion` folder, install the required `langchain` and `ollama` dependencies:
