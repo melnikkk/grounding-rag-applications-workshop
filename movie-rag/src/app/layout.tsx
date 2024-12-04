@@ -33,13 +33,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="flex flex-col">
-          <Nav showSearch={true} fixed={true} />
+          <Nav/>
           <main className="flex flex-col">
             {children}
           </main>
-          <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+          <footer className="row-start-3 flex gap-2 flex-wrap items-center justify-center">
           Made by Carly Richmond with 💜 and excessive amounts of 🍵 and inspiration from 
-            <a href="https://github.com/elastic/Elastiflix">Elastifix</a>
+            <a className="elastifix-ref" href="https://github.com/elastic/Elastiflix">Elastifix</a>
           </footer>
         </div>
       </body>
