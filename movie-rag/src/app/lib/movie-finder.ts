@@ -5,6 +5,7 @@ import {
 
 import { Ollama, OllamaEmbeddings } from "@langchain/ollama";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatMessageHistory } from "langchain/stores/message/in_memory";
 
 import { Client, type ClientOptions } from "@elastic/elasticsearch";
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
@@ -56,14 +57,17 @@ const llm = new Ollama({
   maxRetries: 3,
 });
 
+// Chat History
+const chatHistory = new ChatMessageHistory();
+
 /**
  * Example search function to find relevant movies
  * @param text: prompt to be used for similarity search
  * @returns
  */
-export async function recommendMovies(
-  question: string
-): Promise<ReadableStream> {
+export async function recommendMovies(question: string): Promise<ReadableStream> {
+  chatHistory.addUserMessage(question);
+
   const filter = [
     {
       operator: "match",
@@ -83,6 +87,7 @@ export async function recommendMovies(
 
   const stream = await customRagChain.stream({
     question: question,
+    messages: await chatHistory.getMessages(),
     context,
   });
 

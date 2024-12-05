@@ -127,7 +127,36 @@ If relevant we should also consider disabling the input element as well:
 </form>
 ```
 
-### Sources
+### History
+
+Often you may want to ensure the full message history is available to the LLM to take prior messages into consideration. There are [several ways to do this in Langchain](https://js.langchain.com/v0.2/docs/how_to/chatbots_memory/), with the simplest being you can add the messages to the prompt.
+
+Here we shall add the chat history to the chain in `movie-finder.ts`:
+
+1. Instantiate a new chat history:
+
+```ts
+// Chat History
+import { ChatMessageHistory } from "langchain/stores/message/in_memory";
+
+const chatHistory = new ChatMessageHistory();
+```
+
+2. Amend the `recommendMovies` function to add the user message to the chat history:
+
+```ts
+chatHistory.addUserMessage(question);
+```
+
+3. Pass the messages to the stream:
+
+```ts
+const stream = await customRagChain.stream({
+    question: question,
+    messages: await chatHistory.getMessages(),
+    context,
+  });
+```
 
 ### Example Facet
 
