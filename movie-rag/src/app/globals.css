@@ -30,28 +30,29 @@ body {
 }
 
 /*Oscar link*/
-.oscar-link {   
+.oscar-link {
   position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
-    background-color: #F68FBE;
-    border: 1px solid #81858f;
-    height: 45px;
-    border-radius: 50%;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 5%;
-    width: 100px;
-    text-align: center;
-    padding-top: 0.5rem;
-    font-weight: bold;
+  top: 0.25rem;
+  right: 0.25rem;
+  background-color: #F68FBE;
+  border: 1px solid #81858f;
+  height: 45px;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 5%;
+  width: 100px;
+  text-align: center;
+  padding-top: 0.5rem;
+  font-weight: bold;
 }
 
+/* Text box */
 #oscar__input {
   color: var(--font-color) !important;
 }
 
-#stop__button {
-  background-color: #F86B63;
+/* Buttons */
+button {
   border: 1px solid #81858f;
   height: 45px;
   border-radius: 50%;
@@ -60,6 +61,27 @@ body {
   width: 100px;
   text-align: center;
   font-weight: bold;
+}
+
+#stop__button {
+  background-color: #F86B63;
+}
+
+#retry__button {
+  background-color: #36A2EF;
+  margin: auto;
+
+  margin-top: 1rem;
+}
+
+/* Error handling */
+.error__container {
+  margin: auto;
+  margin-top: 2rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Movie Spinner credit 
@@ -74,12 +96,12 @@ https://codepen.io/pozda/pen/XxoyKe */
 }
 
 .loader__text {
-      margin: 5px auto;
-      color: var(--foreground);    
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: var(--spinner-font);
-  }
+  margin: 5px auto;
+  color: var(--foreground);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--spinner-font);
+}
 
 .loader__filmstrip {
   position: relative;
@@ -87,21 +109,34 @@ https://codepen.io/pozda/pen/XxoyKe */
   height: 70px;
   background: var(--foreground);
   z-index: -1;
-  &:before, &:after {
-      content: '';
-      position: absolute;
-      height: 120%;
-      border-left: 5px dashed var(--background);
-      animation: roll 20ms infinite;
+
+  &:before,
+  &:after {
+    content: '';
+    position: absolute;
+    height: 120%;
+    border-left: 5px dashed var(--background);
+    animation: roll 20ms infinite;
   }
-  &:before {left: 5px;}
-  &:after {right: 5px;}
-  
+
+  &:before {
+    left: 5px;
+  }
+
+  &:after {
+    right: 5px;
+  }
+
 }
 
 @keyframes roll {
-  0% {top: 0px;}
-  100% {top: -15px;}
+  0% {
+    top: 0px;
+  }
+
+  100% {
+    top: -15px;
+  }
 }
 
 /* From Elastifix*/
@@ -267,7 +302,7 @@ code {
   justify-content: space-between;
   align-items: center;
   padding: 10px 40px;
-  
+
   top: 0;
   transition: all 0.5s;
   transition-timing-function: ease-in;
@@ -849,7 +884,8 @@ input[type="checkbox"] {
 }
 
 .content-wrap {
-  padding-bottom: 2.5rem;    /* Footer height */
+  padding-bottom: 2.5rem;
+  /* Footer height */
 }
 
 
@@ -869,7 +905,7 @@ footer {
   margin-top: 5px;
 }
 
-.no-results { 
+.no-results {
   text-align: center;
   color: white;
   font-family: sans-serif;
