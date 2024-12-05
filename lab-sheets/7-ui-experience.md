@@ -137,7 +137,14 @@ If relevant we should also consider disabling the input element as well:
 
 ### Other Considerations
 
-One glaring issue with our implementation is the lack of sanitization of our input. 
+One glaring issue with our implementation is the lack of sanitization of our input. Sanitization is important for several reasons:
+
+1. You may have requests outside of your domain that you don't want to action. For example, someone asking Oscar to generate code for a React component instead of using ChatGPT.
+2. Other types of inappropriate, dangerous or forbidden requests.
+3. Requests that may violate application usage policies.
+4. Attempts to extract sensitive information using approaches such as prompt injection attacks.
+
+There are other practices and tools available, outside of the scope of this workshop, that can help you. Check out [this piece from Elastic Security Labs](https://www.elastic.co/security-labs/embedding-security-in-llm-workflows) and open source tools such as [LLM-Guard](https://github.com/protectai/llm-guard), [LangKit](https://github.com/whylabs/langkit/tree/main) and [Open-Prompt Injection](https://github.com/liu00222/Open-Prompt-Injection).
 
 ## Expected Result
 
