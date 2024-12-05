@@ -50,11 +50,27 @@ body {
   color: var(--font-color) !important;
 }
 
+#stop__button {
+  background-color: #F86B63;
+  border: 1px solid #81858f;
+  height: 45px;
+  border-radius: 50%;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 5%;
+  width: 100px;
+  text-align: center;
+  font-weight: bold;
+}
+
 /* Movie Spinner credit 
 https://codepen.io/pozda/pen/XxoyKe */
 .spinner__container {
   margin: auto;
   margin-top: 2rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .loader__text {
