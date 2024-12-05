@@ -116,7 +116,7 @@ export async function POST(req: Request) {
 
 Through this simple example we have created a simple chatbot that can engage with our questions and stream responses back:
 
-[TODO: screenshot]
+![Oscar Chatbot without RAG](./screenshots/5/5-oscar-without-rag.png)
 
 However, there are limitations with this implementation when building an enterprise chatbot:
 

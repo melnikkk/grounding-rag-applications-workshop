@@ -133,7 +133,7 @@ import { LangChainAdapter } from 'ai';
 import { recommendMovies } from "../../lib/movie-finder";
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30; // TODO
+export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
@@ -163,4 +163,4 @@ export async function POST(req: Request) {
 
 When running the application locally using `npm run dev` we are able to ask Oscar questions and receive a response based on the provided context:
 
-[TODO screenshot!]
+![Oscar Simple RAG](./screenshots/6/lab-6-simple-oscar-rag.png)
