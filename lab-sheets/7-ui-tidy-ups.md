@@ -40,7 +40,7 @@ The above snippet will show a loading animation when awaiting a response.
 
 ### Stop Button
 
-What is the user changes their mind and wants to stop the request? It happens! We need to include a stop button as well to improve their experience. The best place for this button would be in the `<div className="spinner_container">` element:
+What is the user changes their mind and wants to stop the request? It happens! We need to include a stop button as well to improve their experience. The best place for this button would be in the `<div className="spinner_container">` element in `oscar/page.tsx`:
 
 ```tsx
 'use client';
