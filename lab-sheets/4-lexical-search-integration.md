@@ -75,7 +75,7 @@ GET movies/_search
 ```json
 GET movies/_search
 {
-  "size": 5,
+  "size": 4,
   "_source": [ "metadata", "text" ],
   "sort": [{ "metadata.popularity": "desc" }],
   "query": {
