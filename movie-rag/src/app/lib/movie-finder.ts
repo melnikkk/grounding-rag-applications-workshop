@@ -66,30 +66,5 @@ const chatHistory = new ChatMessageHistory();
  * @returns
  */
 export async function recommendMovies(question: string): Promise<ReadableStream> {
-  chatHistory.addUserMessage(question);
-
-  const filter = [
-    {
-      operator: "match",
-      field: "isAdult",
-      value: false,
-    },
-  ];
-  const retriever = vectorStore.asRetriever(3, filter);
-
-  const customRagChain = await createStuffDocumentsChain({
-    llm: llm,
-    prompt: prompt,
-    outputParser: new StringOutputParser(),
-  });
-
-  const context = await retriever.invoke(question);
-
-  const stream = await customRagChain.stream({
-    question: question,
-    messages: await chatHistory.getMessages(),
-    context,
-  });
-
-  return stream;
+  
 }
