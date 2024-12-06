@@ -49,7 +49,7 @@ GET movies-carly-richmond/_search
 ```zsh
 curl http://localhost:11434/api/embeddings -d '{
   "model": "mxbai-embed-large",
-  "prompt":"Films to make me laugh"
+  "prompt":"Why is the sky blue?"
 }' > embedding.json
 ```
 

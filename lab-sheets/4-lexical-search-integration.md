@@ -75,7 +75,7 @@ GET movies/_search
 ```json
 GET movies/_search
 {
-  "size": 4,
+  "size": 5,
   "_source": [ "metadata", "text" ],
   "sort": [{ "metadata.popularity": "desc" }],
   "query": {
@@ -163,6 +163,27 @@ export async function getPopularMovies() {
   };
 
   return client.search(query);
+}
+```
+
+9. Amend the `.api/popular` route to return the results of the query:
+
+```tsx
+export async function GET(req: Request) {
+  try {
+    const popularResponses = await getPopularMovies();
+    const movies = popularResponses?.hits.hits.map((doc) => {
+      return doc._source;
+    })
+
+    return Response.json({ results: movies });
+  } catch (e) {
+    console.error(e);
+    return Response.json({
+      results: [],
+      errorMessage: e
+    });
+  }
 }
 ```
 
