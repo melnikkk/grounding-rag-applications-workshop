@@ -12,6 +12,10 @@ import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { StringOutputParser } from "@langchain/core/output_parsers";
 
 // Initialize Ollama embeddings for the query
+const ollamaEmbeddings = new OllamaEmbeddings({
+  model: "mxbai-embed-large", // Default value
+  baseUrl: "http://localhost:11434", // Default value
+});
 
 /**
  * Example search function to find relevant movies
@@ -19,5 +23,5 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
  * @returns
  */
 export async function recommendMovies(question: string): Promise<ReadableStream> {
-  
+  console.log('==== recommendMovies =====')
 }
